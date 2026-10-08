@@ -1,0 +1,824 @@
+  ```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Civic Complaint Portal</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f1ff;
+    color: #333;
+}
+
+header {
+    background: #5b2c83;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+.language-box {
+    text-align: right;
+    padding: 15px 5%;
+    background: white;
+}
+
+.language-box select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #aaa;
+}
+
+.container {
+    max-width: 850px;
+    margin: 25px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 6px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+button {
+    border: none;
+    padding: 11px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.add-btn {
+    background: #6c5ce7;
+    color: white;
+}
+
+.remove-btn {
+    background: #d63031;
+    color: white;
+}
+
+.record-btn {
+    background: #8e44ad;
+    color: white;
+}
+
+.stop-btn {
+    background: #e67e22;
+    color: white;
+}
+
+.delete-btn {
+    background: #c0392b;
+    color: white;
+}
+
+.submit-btn {
+    width: 100%;
+    background: #5b2c83;
+    color: white;
+    font-size: 17px;
+    padding: 14px;
+    margin-top: 25px;
+}
+
+.preview {
+    max-width: 250px;
+    margin-top: 10px;
+    border-radius: 10px;
+    display: none;
+}
+
+audio {
+    width: 100%;
+    margin-top: 10px;
+    display: none;
+}
+
+.result {
+    margin-top: 25px;
+    padding: 20px;
+    background: #f1eaff;
+    border-radius: 12px;
+    display: none;
+}
+
+.result h2 {
+    color: #5b2c83;
+}
+
+.priority {
+    font-weight: bold;
+}
+
+.error {
+    color: #d63031;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.success {
+    color: green;
+    font-weight: bold;
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1 id="title">🏛️ Civic Complaint Portal</h1>
+    <p id="subtitle">Report your civic problem easily</p>
+</header>
+
+<div class="language-box">
+    <label for="languageSelect" id="languageLabel">Language</label>
+
+    <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="ta">தமிழ்</option>
+        <option value="hi">हिन्दी</option>
+        <option value="te">తెలుగు</option>
+        <option value="ml">മലയാളം</option>
+    </select>
+</div>
+
+<div class="container">
+
+    <label id="nameLabel">Citizen Name</label>
+    <input type="text" id="name">
+
+    <label id="phoneLabel">Phone Number</label>
+    <input type="tel" id="phone">
+
+    <label id="emailLabel">Email ID</label>
+    <input type="email" id="email">
+
+    <label id="locationLabel">Location</label>
+    <input type="text" id="location">
+
+    <label id="typeLabel">Complaint Type</label>
+
+    <select id="complaintType">
+        <option>Road Damage</option>
+        <option>Garbage</option>
+        <option>Street Light</option>
+        <option>Water Supply</option>
+        <option>Drainage</option>
+        <option>Electrical Hazard</option>
+        <option>Hospital Emergency</option>
+        <option>Accident</option>
+        <option>Tree Breakage</option>
+        <option>Illegal Sign Boards</option>
+        <option>Other</option>
+    </select>
+
+    <button class="add-btn" onclick="addComplaintType()" id="addTypeBtn">
+        ➕ Add Type
+    </button>
+
+    <button class="remove-btn" onclick="removeComplaintType()" id="removeTypeBtn">
+        ❌ Remove Selected
+    </button>
+
+    <label id="descriptionLabel">Complaint Description</label>
+
+    <textarea id="description"
+        placeholder="Describe your complaint"></textarea>
+
+    <label id="imageLabel">Upload Complaint Image</label>
+
+    <input type="file"
+           id="image"
+           accept="image/*"
+           onchange="previewImage()">
+
+    <img id="imagePreview" class="preview">
+
+    <label id="voiceLabel">Voice Note</label>
+
+    <button class="record-btn"
+            onclick="startRecording()"
+            id="startBtn">
+        🎙️ Start Recording
+    </button>
+
+    <button class="stop-btn"
+            onclick="stopRecording()"
+            id="stopBtn">
+        ⏹ Stop
+    </button>
+
+    <button class="delete-btn"
+            onclick="deleteRecording()"
+            id="deleteBtn">
+        🗑 Delete
+    </button>
+
+    <audio id="audioPlayer" controls></audio>
+
+    <button class="submit-btn"
+            onclick="submitComplaint()"
+            id="submitBtn">
+        🚀 Submit Complaint
+    </button>
+
+    <div id="message"></div>
+
+    <div class="result" id="result">
+
+        <h2 id="resultTitle">🤖 AI Analysis</h2>
+
+        <p>
+            <strong id="resultTypeLabel">Complaint Type:</strong>
+            <span id="resultType"></span>
+        </p>
+
+        <p>
+            <strong id="priorityLabel">Priority:</strong>
+            <span id="priority" class="priority"></span>
+        </p>
+
+        <p>
+            <strong id="severityLabel">Severity:</strong>
+            <span id="severity"></span>/5
+        </p>
+
+        <p>
+            <strong id="reasonLabel">Reason:</strong>
+            <span id="reason"></span>
+        </p>
+
+        <p>
+            <strong id="departmentLabel">Department:</strong>
+            <span id="department"></span>
+        </p>
+
+        <p>
+            <strong id="statusLabel">Status:</strong>
+            <span id="status">Received</span>
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+
+/* ==================================================
+   BACKEND
+================================================== */
+
+const BACKEND_URL = "http://127.0.0.1:5000";
+
+
+/* ==================================================
+   TRANSLATIONS
+================================================== */
+
+const translations = {
+
+    en: {
+        title: "🏛️ Civic Complaint Portal",
+        subtitle: "Report your civic problem easily",
+        language: "Language",
+        name: "Citizen Name",
+        phone: "Phone Number",
+        email: "Email ID",
+        location: "Location",
+        type: "Complaint Type",
+        description: "Complaint Description",
+        descriptionPlaceholder: "Describe your complaint",
+        image: "Upload Complaint Image",
+        voice: "Voice Note",
+        addType: "➕ Add Type",
+        removeType: "❌ Remove Selected",
+        start: "🎙️ Start Recording",
+        stop: "⏹ Stop",
+        delete: "🗑 Delete",
+        submit: "🚀 Submit Complaint",
+        analysis: "🤖 AI Analysis",
+        resultType: "Complaint Type:",
+        priority: "Priority:",
+        severity: "Severity:",
+        reason: "Reason:",
+        department: "Department:",
+        status: "Status:",
+        received: "Received",
+        submitted: "Complaint submitted successfully!"
+    },
+
+    ta: {
+        title: "🏛️ குடிமக்கள் புகார் தளம்",
+        subtitle: "உங்கள் பொது பிரச்சினையை எளிதாக தெரிவிக்கவும்",
+        language: "மொழி",
+        name: "புகாரளிப்பவர் பெயர்",
+        phone: "தொலைபேசி எண்",
+        email: "மின்னஞ்சல்",
+        location: "இடம்",
+        type: "புகார் வகை",
+        description: "புகார் விவரம்",
+        descriptionPlaceholder: "உங்கள் புகாரை விவரிக்கவும்",
+        image: "புகார் படத்தை பதிவேற்றவும்",
+        voice: "குரல் பதிவு",
+        addType: "➕ வகையைச் சேர்க்கவும்",
+        removeType: "❌ தேர்ந்தெடுத்ததை நீக்கவும்",
+        start: "🎙️ பதிவு தொடங்கு",
+        stop: "⏹ நிறுத்து",
+        delete: "🗑 நீக்கு",
+        submit: "🚀 புகாரை சமர்ப்பிக்கவும்",
+        analysis: "🤖 AI பகுப்பாய்வு",
+        resultType: "புகார் வகை:",
+        priority: "முன்னுரிமை:",
+        severity: "தீவிரம்:",
+        reason: "காரணம்:",
+        department: "துறை:",
+        status: "நிலை:",
+        received: "பெறப்பட்டது",
+        submitted: "புகார் வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது!"
+    },
+
+    hi: {
+        title: "🏛️ नागरिक शिकायत पोर्टल",
+        subtitle: "अपनी नागरिक समस्या आसानी से दर्ज करें",
+        language: "भाषा",
+        name: "नागरिक का नाम",
+        phone: "फोन नंबर",
+        email: "ईमेल आईडी",
+        location: "स्थान",
+        type: "शिकायत का प्रकार",
+        description: "शिकायत का विवरण",
+        descriptionPlaceholder: "अपनी शिकायत का विवरण दें",
+        image: "शिकायत की तस्वीर अपलोड करें",
+        voice: "वॉइस नोट",
+        addType: "➕ प्रकार जोड़ें",
+        removeType: "❌ चयनित हटाएं",
+        start: "🎙️ रिकॉर्ड शुरू करें",
+        stop: "⏹ रोकें",
+        delete: "🗑 हटाएं",
+        submit: "🚀 शिकायत जमा करें",
+        analysis: "🤖 AI विश्लेषण",
+        resultType: "शिकायत प्रकार:",
+        priority: "प्राथमिकता:",
+        severity: "गंभीरता:",
+        reason: "कारण:",
+        department: "विभाग:",
+        status: "स्थिति:",
+        received: "प्राप्त",
+        submitted: "शिकायत सफलतापूर्वक जमा हुई!"
+    },
+
+    te: {
+        title: "🏛️ పౌర ఫిర్యాదు పోర్టల్",
+        subtitle: "మీ పౌర సమస్యను సులభంగా నివేదించండి",
+        language: "భాష",
+        name: "పౌరుని పేరు",
+        phone: "ఫోన్ నంబర్",
+        email: "ఇమెయిల్ ID",
+        location: "స్థానం",
+        type: "ఫిర్యాదు రకం",
+        description: "ఫిర్యాదు వివరాలు",
+        descriptionPlaceholder: "మీ ఫిర్యాదును వివరించండి",
+        image: "ఫిర్యాదు చిత్రాన్ని అప్‌లోడ్ చేయండి",
+        voice: "వాయిస్ నోట్",
+        addType: "➕ రకం జోడించండి",
+        removeType: "❌ ఎంచుకున్నదాన్ని తొలగించండి",
+        start: "🎙️ రికార్డింగ్ ప్రారంభించండి",
+        stop: "⏹ ఆపండి",
+        delete: "🗑 తొలగించండి",
+        submit: "🚀 ఫిర్యాదును సమర్పించండి",
+        analysis: "🤖 AI విశ్లేషణ",
+        resultType: "ఫిర్యాదు రకం:",
+        priority: "ప్రాధాన్యత:",
+        severity: "తీవ్రత:",
+        reason: "కారణం:",
+        department: "శాఖ:",
+        status: "స్థితి:",
+        received: "స్వీకరించబడింది",
+        submitted: "ఫిర్యాదు విజయవంతంగా సమర్పించబడింది!"
+    },
+
+    ml: {
+        title: "🏛️ പൗര പരാതി പോർട്ടൽ",
+        subtitle: "നിങ്ങളുടെ പൗര പ്രശ്നം എളുപ്പത്തിൽ റിപ്പോർട്ട് ചെയ്യുക",
+        language: "ഭാഷ",
+        name: "പൗരന്റെ പേര്",
+        phone: "ഫോൺ നമ്പർ",
+        email: "ഇമെയിൽ ഐഡി",
+        location: "സ്ഥലം",
+        type: "പരാതിയുടെ തരം",
+        description: "പരാതിയുടെ വിശദാംശങ്ങൾ",
+        descriptionPlaceholder: "നിങ്ങളുടെ പരാതി വിശദീകരിക്കുക",
+        image: "പരാതിയുടെ ചിത്രം അപ്‌ലോഡ് ചെയ്യുക",
+        voice: "വോയ്സ് നോട്ട്",
+        addType: "➕ തരം ചേർക്കുക",
+        removeType: "❌ തിരഞ്ഞെടുത്തത് നീക്കം ചെയ്യുക",
+        start: "🎙️ റെക്കോർഡിംഗ് ആരംഭിക്കുക",
+        stop: "⏹ നിർത്തുക",
+        delete: "🗑 നീക്കം ചെയ്യുക",
+        submit: "🚀 പരാതി സമർപ്പിക്കുക",
+        analysis: "🤖 AI വിശകലനം",
+        resultType: "പരാതിയുടെ തരം:",
+        priority: "മുൻഗണന:",
+        severity: "തീവ്രത:",
+        reason: "കാരണം:",
+        department: "വകുപ്പ്:",
+        status: "നില:",
+        received: "ലഭിച്ചു",
+        submitted: "പരാതി വിജയകരമായി സമർപ്പിച്ചു!"
+    }
+};
+
+
+/* ==================================================
+   LANGUAGE CHANGE
+================================================== */
+
+document.getElementById("languageSelect")
+.addEventListener("change", function() {
+
+    const lang = this.value;
+    const t = translations[lang];
+
+    document.getElementById("title").textContent = t.title;
+    document.getElementById("subtitle").textContent = t.subtitle;
+    document.getElementById("languageLabel").textContent = t.language;
+
+    document.getElementById("nameLabel").textContent = t.name;
+    document.getElementById("phoneLabel").textContent = t.phone;
+    document.getElementById("emailLabel").textContent = t.email;
+    document.getElementById("locationLabel").textContent = t.location;
+    document.getElementById("typeLabel").textContent = t.type;
+    document.getElementById("descriptionLabel").textContent = t.description;
+
+    document.getElementById("description").placeholder =
+        t.descriptionPlaceholder;
+
+    document.getElementById("imageLabel").textContent = t.image;
+    document.getElementById("voiceLabel").textContent = t.voice;
+
+    document.getElementById("addTypeBtn").textContent = t.addType;
+    document.getElementById("removeTypeBtn").textContent = t.removeType;
+
+    document.getElementById("startBtn").textContent = t.start;
+    document.getElementById("stopBtn").textContent = t.stop;
+    document.getElementById("deleteBtn").textContent = t.delete;
+
+    document.getElementById("submitBtn").textContent = t.submit;
+
+    document.getElementById("resultTitle").textContent = t.analysis;
+
+    document.getElementById("resultTypeLabel").textContent = t.resultType;
+    document.getElementById("priorityLabel").textContent = t.priority;
+    document.getElementById("severityLabel").textContent = t.severity;
+    document.getElementById("reasonLabel").textContent = t.reason;
+    document.getElementById("departmentLabel").textContent = t.department;
+    document.getElementById("statusLabel").textContent = t.status;
+
+    document.getElementById("status").textContent = t.received;
+});
+
+
+/* ==================================================
+   ADD COMPLAINT TYPE
+================================================== */
+
+function addComplaintType() {
+
+    const type = prompt("Enter new complaint type:");
+
+    if (type && type.trim() !== "") {
+
+        const option = document.createElement("option");
+
+        option.textContent = type.trim();
+
+        document.getElementById("complaintType")
+            .appendChild(option);
+
+        document.getElementById("complaintType")
+            .value = type.trim();
+    }
+}
+
+
+/* ==================================================
+   REMOVE COMPLAINT TYPE
+================================================== */
+
+function removeComplaintType() {
+
+    const select = document.getElementById("complaintType");
+
+    if (select.options.length > 1) {
+        select.remove(select.selectedIndex);
+    }
+}
+
+
+/* ==================================================
+   IMAGE PREVIEW
+================================================== */
+
+function previewImage() {
+
+    const file = document.getElementById("image").files[0];
+
+    const preview = document.getElementById("imagePreview");
+
+    if (file) {
+
+        preview.src = URL.createObjectURL(file);
+
+        preview.style.display = "block";
+
+    } else {
+
+        preview.style.display = "none";
+    }
+}
+
+
+/* ==================================================
+   VOICE RECORDING
+================================================== */
+
+let mediaRecorder;
+let audioChunks = [];
+let voiceBlob = null;
+
+async function startRecording() {
+
+    try {
+
+        const stream =
+            await navigator.mediaDevices.getUserMedia({
+                audio: true
+            });
+
+        audioChunks = [];
+
+        mediaRecorder =
+            new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = function(event) {
+
+            audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = function() {
+
+            voiceBlob = new Blob(
+                audioChunks,
+                { type: "audio/webm" }
+            );
+
+            const audioURL =
+                URL.createObjectURL(voiceBlob);
+
+            const player =
+                document.getElementById("audioPlayer");
+
+            player.src = audioURL;
+            player.style.display = "block";
+        };
+
+        mediaRecorder.start();
+
+        document.getElementById("startBtn")
+            .disabled = true;
+
+        document.getElementById("stopBtn")
+            .disabled = false;
+
+    } catch (error) {
+
+        alert("Microphone permission is required.");
+    }
+}
+
+
+function stopRecording() {
+
+    if (mediaRecorder &&
+        mediaRecorder.state !== "inactive") {
+
+        mediaRecorder.stop();
+
+        mediaRecorder.stream
+            .getTracks()
+            .forEach(track => track.stop());
+
+        document.getElementById("startBtn")
+            .disabled = false;
+
+        document.getElementById("stopBtn")
+            .disabled = true;
+    }
+}
+
+
+function deleteRecording() {
+
+    voiceBlob = null;
+
+    audioChunks = [];
+
+    const player =
+        document.getElementById("audioPlayer");
+
+    player.src = "";
+
+    player.style.display = "none";
+}
+
+
+/* ==================================================
+   SUBMIT COMPLAINT
+================================================== */
+
+async function submitComplaint() {
+
+    const message =
+        document.getElementById("message");
+
+    message.className = "";
+    message.textContent = "";
+
+    const formData = new FormData();
+
+    formData.append(
+        "name",
+        document.getElementById("name").value
+    );
+
+    formData.append(
+        "phone",
+        document.getElementById("phone").value
+    );
+
+    formData.append(
+        "email",
+        document.getElementById("email").value
+    );
+
+    formData.append(
+        "location",
+        document.getElementById("location").value
+    );
+
+    formData.append(
+        "complaint_type",
+        document.getElementById("complaintType").value
+    );
+
+    formData.append(
+        "description",
+        document.getElementById("description").value
+    );
+
+
+    const image =
+        document.getElementById("image").files[0];
+
+    if (image) {
+        formData.append("image", image);
+    }
+
+
+    if (voiceBlob) {
+
+        formData.append(
+            "voice",
+            voiceBlob,
+            "voice_note.webm"
+        );
+    }
+
+
+    try {
+
+        const response = await fetch(
+            `${BACKEND_URL}/api/complaints`,
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok ||
+            !result.success) {
+
+            throw new Error(
+                result.error ||
+                "Server error"
+            );
+        }
+
+
+        const data = result.data;
+
+
+        document.getElementById("result")
+            .style.display = "block";
+
+
+        document.getElementById("resultType")
+            .textContent =
+            data.complaint_type;
+
+
+        document.getElementById("priority")
+            .textContent =
+            data.priority;
+
+
+        document.getElementById("severity")
+            .textContent =
+            data.severity;
+
+
+        document.getElementById("reason")
+            .textContent =
+            data.reason;
+
+
+        document.getElementById("department")
+            .textContent =
+            data.department;
+
+
+        document.getElementById("status")
+            .textContent =
+            data.status;
+
+
+        const lang =
+            document.getElementById(
+                "languageSelect"
+            ).value;
+
+
+        message.className = "success";
+
+        message.textContent =
+            translations[lang].submitted;
+
+
+    } catch (error) {
+
+        message.className = "error";
+
+        message.textContent =
+            "❌ Error: " + error.message;
+
+        console.error(error);
+    }
+}
+
+</script>
+
+</body>
+</html>
+```
+
